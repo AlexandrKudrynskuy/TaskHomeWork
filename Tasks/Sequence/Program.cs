@@ -10,22 +10,66 @@
 
 
 
-string str1 = "123456789trertrwe";
-string str2 = "132465780asewsdew";
-int count = 3;
-var strArr1 = SplitStr(str1, count);
-Console.WriteLine($"___________________________________");
-var strArr2 = SplitStr(str2, count);
-int dig = SubSequence(str1, str2);
-Console.WriteLine(dig);
-int newCount = 0;
-int temp = 0;
-for (int i = 0; i < count; i++)
+using System.Diagnostics;
+string directoeyPath =  Directory.GetCurrentDirectory();
+var taskReadFirst = Task<string>.Run(() => { return File.ReadAllText(directoeyPath + "\\" + "1.txt"); });
+var taskReadSecond = Task<string>.Run(() => { return File.ReadAllText(directoeyPath + "\\" + "2.txt"); });
+
+string strFirst = taskReadFirst.Result;
+string strSecond = taskReadSecond.Result;
+
+var sw = new Stopwatch();
+sw.Start();
+int res = SubSequence(strFirst, strSecond);
+//Console.WriteLine(strFirst);
+//Console.WriteLine(strSecond);
+Console.WriteLine($"Count = {res}");
+Console.WriteLine("_____________________\n");
+sw.Stop();
+Console.WriteLine($"time {sw.ElapsedMilliseconds}");
+
+int numberOfParts = 5;
+var arrFirst = SplitStr(strFirst, numberOfParts);
+var arrSecond = SplitStr(strSecond, numberOfParts);
+
+//Console.BackgroundColor = ConsoleColor.Blue;
+//Console.ForegroundColor = ConsoleColor.Yellow;
+//foreach (var it in arrFirst)
+//{
+//    Console.Write($"{it}\t");
+//}
+//Console.ResetColor();
+
+//Console.WriteLine("\n_____________________\n");
+//Console.BackgroundColor = ConsoleColor.Yellow;
+//Console.ForegroundColor = ConsoleColor.DarkBlue;
+//foreach (var it in arrSecond)
+//{
+//    Console.Write($"{it}\t");
+//}
+//Console.ResetColor();
+//Console.WriteLine("\n_____________________\n");
+
+
+var tasks = new List<Task<int>>();
+sw.Start();
+for (int i = 0; i < numberOfParts; i++)
 {
-    temp = SubSequence(strArr1[i], strArr2[i]);
-    newCount += SubSequence(strArr1[i], strArr2[i]);
-    Console.WriteLine(temp);
+    tasks.Add(Task<int>.Run(() => { return SubSequence(arrFirst[i], arrSecond[i]); }));
+    Thread.Sleep(100); ///// ?
 }
+Task.WaitAll(tasks.ToArray());
+int resAfterPart = 0;
+
+foreach (var ts in tasks)
+{
+    resAfterPart += ts.Result;
+}
+Console.WriteLine($"Count after partition = {resAfterPart}");
+sw.Stop();
+Console.WriteLine($"time after partition {sw.ElapsedMilliseconds}");
+
+
 string[] SplitStr(string str, int count)
 {
     string[] arr = new string[count];
@@ -35,13 +79,13 @@ string[] SplitStr(string str, int count)
         if (i == count - 1)
         {
             arr[i] = str.Substring(pos, str.Length - pos);
-            Console.Write($"ar ={arr[i]}, count = {arr[i].Length}");
-            Console.WriteLine();
+            //Console.Write($"ar ={arr[i]}, count = {arr[i].Length}");
+            //Console.WriteLine();
             break;
         }
         arr[i] = str.Substring(pos, str.Length / count);
-        Console.Write($"ar ={arr[i]}, count = {arr[i].Length}");
-        Console.WriteLine();
+        //Console.Write($"ar ={arr[i]}, count = {arr[i].Length}");
+        //Console.WriteLine();
         pos += str.Length / count;
     }
     return arr;
@@ -69,11 +113,11 @@ int SubSequence(string firstStr, string secondStr)
             }
         }
     }
-    //for(int i=0;i<ar.GetLength(0);i++)
+    //for (int i = 0; i < ar.GetLength(0); i++)
     //{
-    //    for (int j = 0; j < ar.GetLength(1);j++)
+    //    for (int j = 0; j < ar.GetLength(1); j++)
     //    {
-    //        Console.Write($"{ar[i,j]} ");
+    //        Console.Write($"{ar[i, j]} ");
     //    }
     //    Console.WriteLine();
 
