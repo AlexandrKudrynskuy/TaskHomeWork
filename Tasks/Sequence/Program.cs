@@ -52,6 +52,7 @@ var arrSecond = SplitStr(strSecond, numberOfParts);
 
 
 var tasks = new List<Task<int>>();
+sw.Reset();
 sw.Start();
 for (int i = 0; i < numberOfParts; i++)
 {
